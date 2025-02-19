@@ -29,7 +29,7 @@ function Dashboard() {
         setLoadingLinks(true);
         setErrorLoadingLinks(null);
         try {
-            const response = await api.get(`/links/list`);
+            const response = await api.get('/list');
             if (response.status === 200) {
                 setLinks(response.data);
             } else {
@@ -58,7 +58,7 @@ function Dashboard() {
         }
 
         try {
-            const response = await api.post('/shorten/', { url });
+            const response = await api.post('/shorten', { url });
 
             if (response.status === 201) {
                 setShortenedUrl(response.data.shortened_url);
