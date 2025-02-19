@@ -21,21 +21,24 @@ function Login() {
         }
     }, [auth, navigate]);
 
-    const handleSubmit = async (e) => { // Removed type annotation `: React.FormEvent` for simplicity
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoginError(''); // Clear any previous error message
-        setLoading(true); // Start loading
-
+        setLoginError('');
+        setLoading(true);
+    
         try {
-            await auth.signInWithEmailPassword(usernameOrEmail, password); // Use signInWithEmailPassword from AuthContext
-            navigate('/dashboard'); // Navigate to dashboard on successful login
+            const user = await auth.signInWithEmailPassword(usernameOrEmail, password);
+            if (user) {
+                navigate('/dashboard'); // Redireciona somente se o login for bem-sucedido
+            }
         } catch (error) {
             console.error('Login failed:', error);
-            setLoginError('Falha ao fazer login. Verifique suas credenciais.'); // Set error message
+            setLoginError('Falha ao fazer login. Verifique suas credenciais.');
         } finally {
-            setLoading(false); // End loading
+            setLoading(false);
         }
     };
+    
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-400 to-purple-600 flex flex-col">
