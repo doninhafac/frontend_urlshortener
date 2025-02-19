@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SocialButton } from '../../components/SocialButton';
 import { ArrowRight } from 'lucide-react';
@@ -6,11 +6,20 @@ import Footer from '../../components/Footer';
 import { api } from '../../services/api';
 import { signInWithGoogle } from '../../services/firebaseConfig';
 import { Header } from '../../components/Header';
+import { AuthContext } from '../../context/AuthContext'; // Importe o AuthContext
 
 function Login() {
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const auth = useContext(AuthContext); // Use o AuthContext
+
+    // Redireciona o usuário se ele já estiver autenticado
+    useEffect(() => {
+        if (auth?.user) {
+            navigate('/dashboard'); // Redireciona para o dashboard se o usuário estiver autenticado
+        }
+    }, [auth, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,12 +28,16 @@ function Login() {
             password,
         };
 
-        const response = await api.post('/autenticacao/login/', data);
-        if (response.status === 200) {
-            console.log(response.data);
-            navigate('/dashboard');
-        } else {
-            console.error('Login failed:', response.data);
+        try {
+            const response = await api.post('/autenticacao/login/', data);
+            if (response.status === 200) {
+                console.log(response.data);
+                navigate('/dashboard');
+            } else {
+                console.error('Login failed:', response.data);
+            }
+        } catch (err) {
+            console.error('Erro ao fazer login:', err);
         }
     };
 

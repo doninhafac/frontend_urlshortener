@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SocialButton } from '../../components/SocialButton';
 import { ArrowRight } from 'lucide-react';
 import Footer from '../../components/Footer';
 import { api } from '../../services/api';
 import { Header } from '../../components/Header';
+import { AuthContext } from '../../context/AuthContext'; // Importe o AuthContext
 
 function Register() {
     const [name, setName] = useState('');
@@ -26,6 +27,14 @@ function Register() {
         console.log(response.data);
         navigate('/login');
     };
+    const auth = useContext(AuthContext); // Use o AuthContext
+    
+        // Redireciona o usuário se ele já estiver autenticado
+        useEffect(() => {
+            if (auth?.user) {
+                navigate('/dashboard'); // Redireciona para o dashboard se o usuário estiver autenticado
+            }
+        }, [auth, navigate]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-400 to-purple-600 flex flex-col">
