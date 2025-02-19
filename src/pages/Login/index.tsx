@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SocialButton } from '../../components/SocialButton';
 import { ArrowRight } from 'lucide-react';
 import Footer from '../../components/Footer';
@@ -10,6 +10,7 @@ import { Header } from '../../components/Header';
 function Login() {
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,7 +20,12 @@ function Login() {
         };
 
         const response = await api.post('/autenticacao/login/', data);
-        console.log(response.data);
+        if (response.status === 200) {
+            console.log(response.data);
+            navigate('/dashboard');
+        } else {
+            console.error('Login failed:', response.data);
+        }
     };
 
     return (

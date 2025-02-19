@@ -135,7 +135,7 @@ function ForgotPassword() {
                                     </Link>
                                 </p>
                                 <Link
-                                    to="/"
+                                    to="/login"
                                     className="block text-white underline hover:text-purple-200 transition-colors"
                                 >
                                     Voltar para o login
