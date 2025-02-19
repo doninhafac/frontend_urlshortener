@@ -82,7 +82,7 @@ function Register() {
                             <div className="text-center space-y-4 mt-8">
                                 <p className="text-white">
                                     Já tem uma conta?{' '}
-                                    <Link to="/" className="underline hover:text-purple-200 transition-colors">
+                                    <Link to="/login" className="underline hover:text-purple-200 transition-colors">
                                         Faça login!
                                     </Link>
                                 </p>
