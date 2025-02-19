@@ -13,27 +13,27 @@ function MainPage() {
 
     const handleShorten = async () => {
         if (!url.trim()) {
-            alert("Por favor, insira um link válido.");
+            alert('Por favor, insira um link válido.');
             return;
         }
-    
+
         // Expressão regular para validar URLs
         const urlPattern = /^(https?:\/\/)?([\w-]+(\.[\w-]+)+)(\/[\w-./?%&=]*)?$/;
-        
+
         if (!urlPattern.test(url)) {
-            alert("URL inválida. Certifique-se de incluir http:// ou https://");
+            alert('URL inválida. Certifique-se de incluir http:// ou https://');
             return;
         }
-    
+
         try {
             const response = await api.post('/shorten/', { url });
-    
+
             if (response.status === 201) {
                 setShortenedUrl(response.data.shortened_url);
             } else {
                 console.error('Erro ao encurtar URL:', response.data);
             }
-    
+
             if (!user) {
                 setShowSignupPrompt(true);
             }
@@ -41,14 +41,12 @@ function MainPage() {
             console.error('Erro ao conectar ao backend:', error);
         }
     };
-    
-    
 
     return (
-        <div className="h-screen bg-gradient-to-br from-purple-500 via-purple-400 to-purple-500 relative overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-500 via-purple-400 to-purple-500">
             <Header />
 
-            <main className="h-full flex flex-col items-center justify-center px-4">
+            <main className="flex-grow flex flex-col items-center justify-center px-4">
                 <div className="text-center text-white mb-12">
                     <h1 className="text-4xl md:text-6xl font-bold mb-4">Encurte seus links</h1>
                     <p className="text-xl md:text-2xl opacity-90">Simples, rápido e poderoso</p>
