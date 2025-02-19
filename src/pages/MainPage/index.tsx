@@ -11,6 +11,11 @@ function MainPage() {
     const [shortenedUrl, setShortenedUrl] = useState('');
     const [showSignupPrompt, setShowSignupPrompt] = useState(false);
 
+    const handleCopyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        alert('Link copiado para a área de transferência!');
+    };
+
     const handleShorten = async () => {
         if (!url.trim()) {
             alert('Por favor, insira um link válido.');
@@ -74,7 +79,7 @@ function MainPage() {
                             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                                 <div className="text-xl font-semibold">{shortenedUrl}</div>
                                 <button
-                                    onClick={() => navigator.clipboard.writeText(shortenedUrl)}
+                                    onClick={() => handleCopyToClipboard(shortenedUrl)}
                                     className="px-6 py-2 bg-white text-purple-600 rounded-full hover:bg-purple-100 transition"
                                 >
                                     Copiar
