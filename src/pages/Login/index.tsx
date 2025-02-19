@@ -3,41 +3,37 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SocialButton } from '../../components/SocialButton';
 import { ArrowRight } from 'lucide-react';
 import Footer from '../../components/Footer';
-import { api } from '../../services/api';
-import { signInWithGoogle } from '../../services/firebaseConfig';
 import { Header } from '../../components/Header';
-import { AuthContext } from '../../context/AuthContext'; // Importe o AuthContext
+import { AuthContext } from '../../context/AuthContext'; // Import AuthContext
 
 function Login() {
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loginError, setLoginError] = useState(''); // State for login error message
     const navigate = useNavigate();
-    const auth = useContext(AuthContext); // Use o AuthContext
+    const auth = useContext(AuthContext); // Use AuthContext
+    const [loading, setLoading] = useState(false); // State for loading state during login
 
     // Redireciona o usuário se ele já estiver autenticado
     useEffect(() => {
         if (auth?.user) {
-            navigate('/dashboard'); // Redireciona para o dashboard se o usuário estiver autenticado
+            navigate('/dashboard'); // Redirect to dashboard if user is authenticated
         }
     }, [auth, navigate]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e) => { // Removed type annotation `: React.FormEvent` for simplicity
         e.preventDefault();
-        const data = {
-            username_or_email: usernameOrEmail,
-            password,
-        };
+        setLoginError(''); // Clear any previous error message
+        setLoading(true); // Start loading
 
         try {
-            const response = await api.post('/autenticacao/login/', data);
-            if (response.status === 200) {
-                console.log(response.data);
-                navigate('/dashboard');
-            } else {
-                console.error('Login failed:', response.data);
-            }
-        } catch (err) {
-            console.error('Erro ao fazer login:', err);
+            await auth.signInWithEmailPassword(usernameOrEmail, password); // Use signInWithEmailPassword from AuthContext
+            navigate('/dashboard'); // Navigate to dashboard on successful login
+        } catch (error) {
+            console.error('Login failed:', error);
+            setLoginError('Falha ao fazer login. Verifique suas credenciais.'); // Set error message
+        } finally {
+            setLoading(false); // End loading
         }
     };
 
@@ -71,11 +67,14 @@ function Login() {
                                 <button
                                     type="submit"
                                     className="w-full p-4 rounded-lg bg-purple-500/50 text-white hover:bg-purple-500/70 transition-all duration-300 flex items-center justify-between group hover:scale-[1.02] hover:shadow-lg"
+                                    disabled={loading} // Disable button while loading
                                 >
-                                    <span>Logar</span>
+                                    <span>{loading ? 'Entrando...' : 'Logar'}</span> {/* Show loading text */}
                                     <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </form>
+
+                            {loginError && <p className="text-red-500 mt-2 text-center">{loginError}</p>} {/* Display error message */}
 
                             <div className="text-center space-y-4 mt-8">
                                 <p className="text-white">
@@ -97,17 +96,26 @@ function Login() {
                         <div className="w-full lg:w-1/2 max-w-md space-y-4">
                             <SocialButton
                                 icon="google"
-                                onClick={async () => {
-                                    const user = await signInWithGoogle();
-                                    if (user) {
-                                        console.log('Usuário logado:', user);
-                                        // Aqui você pode enviar o token do Firebase para o backend Django para autenticação
-                                    }
+                                onClick={() => { // Removed async and direct signInWithGoogle import
+                                    setLoginError(''); // Clear any previous error message before Google login
+                                    setLoading(true); // Start loading
+                                    auth.signInWithGoogle() // Use signInWithGoogle from AuthContext
+                                        .then(() => {
+                                            navigate('/dashboard'); // Navigate on success
+                                        })
+                                        .catch((error) => {
+                                            console.error('Google login error:', error);
+                                            setLoginError('Erro ao fazer login com o Google.'); // Set error message
+                                        })
+                                        .finally(() => {
+                                            setLoading(false); // End loading
+                                        });
                                 }}
                                 label="Login com Google"
+                                disabled={loading} // Disable button while loading
                             />
-                            <SocialButton icon="facebook" onClick={() => {}} label="Login com Facebook" />
-                            <SocialButton icon="apple" onClick={() => {}} label="Login com Conta Apple" />
+                            <SocialButton icon="facebook" onClick={() => {}} label="Login com Facebook" disabled={loading} /> {/* Disable button while loading */}
+                            <SocialButton icon="apple" onClick={() => {}} label="Login com Conta Apple" disabled={loading} /> {/* Disable button while loading */}
                         </div>
                     </div>
                 </div>
