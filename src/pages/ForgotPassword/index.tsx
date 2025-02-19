@@ -10,7 +10,6 @@ function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [showResetForm, setShowResetForm] = useState(false);
 
@@ -20,40 +19,40 @@ function ForgotPassword() {
         }
     }, [token]);
 
-    const handleRequestReset = async (e: React.FormEvent) => {
+    const handleRequestReset = async (e) => { // Removed type annotation `: React.FormEvent` for simplicity as requested
         e.preventDefault();
 
         if (!email) {
-            setMessage('O e-mail é obrigatório.');
+            alert('O e-mail é obrigatório.'); // Changed to alert
             return;
         }
 
         try {
             setLoading(true);
             const response = await api.post('/forgotpassword/forgot-password/', { email });
-            setMessage(response.data.message || 'Se o e-mail existir, um link será enviado.');
+            alert(response.data.message || 'Se o e-mail existir, um link será enviado.'); // Changed to alert
         } catch (error) {
-            setMessage('Erro ao enviar o e-mail. Tente novamente mais tarde.');
+            alert('Erro ao enviar o e-mail. Tente novamente mais tarde.'); // Changed to alert
         } finally {
             setLoading(false);
         }
     };
 
-    const handleResetPassword = async (e: React.FormEvent) => {
+    const handleResetPassword = async (e) => { // Removed type annotation `: React.FormEvent` for simplicity as requested
         e.preventDefault();
 
         if (!newPassword || !confirmPassword) {
-            setMessage('Ambas as senhas são obrigatórias.');
+            alert('Ambas as senhas são obrigatórias.'); // Changed to alert
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setMessage('As senhas não coincidem.');
+            alert('As senhas não coincidem.'); // Changed to alert
             return;
         }
 
         if (!token) {
-            setMessage('Link inválido. Tente novamente.');
+            alert('Link inválido. Tente novamente.'); // Changed to alert
             return;
         }
 
@@ -63,9 +62,9 @@ function ForgotPassword() {
                 password: newPassword,
             });
 
-            setMessage(response.data.message || 'Senha redefinida com sucesso!');
+            alert(response.data.message || 'Senha redefinida com sucesso!'); // Changed to alert
         } catch (error) {
-            setMessage('Erro ao redefinir senha. O link pode ter expirado.');
+            alert('Erro ao redefinir senha. O link pode ter expirado.'); // Changed to alert
         } finally {
             setLoading(false);
         }
@@ -142,7 +141,7 @@ function ForgotPassword() {
                                 </Link>
                             </div>
 
-                            {message && <p className="text-white text-center mt-4">{message}</p>}
+                            {/* Message area removed */}
                         </div>
                     </div>
                 </div>
