@@ -29,7 +29,7 @@ function Dashboard() {
         setLoadingLinks(true);
         setErrorLoadingLinks(null);
         try {
-            const response = await api.get(`/links/shorten?user_id=${user.id}`);
+            const response = await api.get(`/links/list`);
             if (response.status === 200) {
                 setLinks(response.data);
             } else {

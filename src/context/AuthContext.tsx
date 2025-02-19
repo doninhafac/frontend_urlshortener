@@ -33,11 +33,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     useEffect(() => {
         const loadStoredUser = () => {
             const storedToken = localStorage.getItem('@CoisaLinks:token');
-            const storedUser = localStorage.getItem('@CoisaLinks:user');
-
-            if (storedToken && storedUser) {
+            if (storedToken && storedToken !== 'undefined') {
                 api.defaults.headers.authorization = `Bearer ${storedToken}`;
-                setUser(JSON.parse(storedUser));
+            } else {
+                delete api.defaults.headers.authorization;
             }
         };
 
@@ -71,7 +70,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 }
             } else {
                 // Firebase user logged out, but check if we have user from other login methods
-                if (!localStorage.getItem('@CoisaLinks:user')) { // Only clear if no user from other methods
+                if (!localStorage.getItem('@CoisaLinks:user')) {
+                    // Only clear if no user from other methods
                     setUser(null);
                     localStorage.removeItem('@CoisaLinks:token');
                     localStorage.removeItem('@CoisaLinks:user');
@@ -84,7 +84,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         return () => unsubscribe();
     }, []);
-
 
     const handleSignInWithGoogle = async () => {
         try {
@@ -115,16 +114,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     };
 
-
     const handleSignInWithEmailPassword = async (email, password) => {
         console.log('signInWithEmailPassword called', email, password);
         setLoading(true);
         try {
             const response = await api.post('/autenticacao/login/', { username_or_email: email, password }); // Corrected key to username_or_email
             console.log('Backend response status:', response.status); // Log status
-            console.log('Backend response data:', response.data);     // Log data
+            console.log('Backend response data:', response.data); // Log data
             const { token: backendToken, usuario } = response.data;
-    
+
             localStorage.setItem('@CoisaLinks:token', backendToken);
             localStorage.setItem('@CoisaLinks:user', JSON.stringify(usuario));
             api.defaults.headers.authorization = `Bearer ${backendToken}`;
@@ -138,12 +136,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     };
 
-
     const signOut = async () => {
         try {
             await auth.signOut(); // Firebase sign out - this might resolve even if not signed in via firebase
         } catch (firebaseSignOutError) {
-            console.error("Erro ao fazer logout do Firebase (pode não estar logado via Firebase):", firebaseSignOutError);
+            console.error(
+                'Erro ao fazer logout do Firebase (pode não estar logado via Firebase):',
+                firebaseSignOutError
+            );
             // It's okay if Firebase sign-out fails if user didn't log in with Firebase
         }
         localStorage.removeItem('@CoisaLinks:token');
@@ -153,9 +153,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(null);
     };
 
-
     return (
-        <AuthContext.Provider value={{ user, signInWithGoogle: handleSignInWithGoogle, signInWithEmailPassword: handleSignInWithEmailPassword, signOut, loading }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                signInWithGoogle: handleSignInWithGoogle,
+                signInWithEmailPassword: handleSignInWithEmailPassword,
+                signOut,
+                loading,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
